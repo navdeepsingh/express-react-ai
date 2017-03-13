@@ -12,6 +12,9 @@ var cors = require('./config/cors');
 var ExtractJwt = passportJWT.ExtractJwt;
 var JwtStrategy = passportJWT.Strategy;
 
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/express_react_ai');
+
 passport.use(new TwitterStrategy({
     consumerKey: config.twitter.CONSUMER_KEY,
     consumerSecret: config.twitter.CONSUMER_SECRET,

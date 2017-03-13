@@ -17,17 +17,24 @@ class App extends Component {
       showStepTwo : false,
       showStepThree : false,
       showAuthLogin : true,
+      stepOneStatus : 'Yet to Start'
     }
 
     this.apiUrl = 'http://localhost:8080/'
   }
 
   componentDidMount() {
-    axios.get(this.apiUrl + `auth/twitter/jwt`)
-      .then((res) => {
-        console.log(res.headers.get('Authorization'));
+    let token = this.getCook('token');
+    console.log(token);
+    //axios.defaults.headers.common['Authorization'] = token;
+    axios.get(this.apiUrl + `auth/twitter/jwt?token=${token}`)
+      .then(res => {
+          if (res.data.valid) {
+            this.setState({stepOneStatus : 'Linked'})
+          }
+          console.log(JSON.stringify(res.data));
       })
-      .catch((err) => {
+      .catch(err => {
         console.error(err);
       })
   }
@@ -37,13 +44,20 @@ class App extends Component {
     window.location = this.apiUrl + 'auth/twitter';
   }
 
+  getCook(cookiename) {
+    // Get name followed by anything except a semicolon
+    var cookiestring=RegExp(""+cookiename+"[^;]+").exec(document.cookie);
+    // Return everything after the equal sign, or an empty string if the cookie name not found
+    return unescape(!!cookiestring ? cookiestring.toString().replace(/^[^=]+./,"") : "");
+  }
+
   render() {
 
     return (
       <div>
         <Wrapper>
           { this.state.showStepOne
-            ? <StepOne onClickTwitterLink={this.handleTwitterLink}></StepOne>
+            ? <StepOne onClickTwitterLink={this.handleTwitterLink} stepOneStatus={this.state.stepOneStatus}></StepOne>
             : null
           }
           { this.state.showStepTwo ? <StepTwo></StepTwo> : null }
@@ -53,5 +67,7 @@ class App extends Component {
     );
   }
 }
+
+
 
 export default App;

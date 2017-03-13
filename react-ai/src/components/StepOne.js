@@ -8,8 +8,19 @@ const stepOne = (props) => {
 
   return (
         <Panel header="Step One : Link with twitter and FB account">
-          <a href="#" onClick={props.onClickTwitterLink}><img src={twitterLogo} width="50" height="50" alt="Twitter" /></a>
-          <a href="#" onClick={props.onClickFacebookLink}><img src={facebookLogo} width="30" height="30" alt="Facebook" /></a>
+          <div className="row">
+            <div className="col-md-6">
+              <a href="#" onClick={props.onClickTwitterLink}><img src={twitterLogo} width="50" height="50" alt="Twitter" /></a>
+              <a href="#" onClick={props.onClickFacebookLink}><img src={facebookLogo} width="30" height="30" alt="Facebook" /></a>
+            </div>
+            <div className="col-md-6">
+              Status:<br />
+              { props.stepOneStatus === 'Linked'
+                ? <p>Connected to Twitter <span className="glyphicon glyphicon-ok" aria-hidden="true"></span></p>
+                : props.stepOneStatus
+              }
+            </div>
+          </div>
         </Panel>
       )
 }
