@@ -12,6 +12,7 @@ let options = {
         maxAge: 1000 * 60 * 60, // would expire after 60 minutes
     }
 
+
 router.get('/', passport.authenticate('twitter'));
 router.get('/callback',
   passport.authenticate('twitter', { failureRedirect: '/login' }),
@@ -27,7 +28,7 @@ router.get('/callback',
       console.error(err);
     });
 
-    res.redirect('http://localhost:3000/');
+    res.redirect('http://localhost:3000/after-auth');
   }
 );
 router.get('/jwt',
@@ -50,8 +51,11 @@ router.get('/jwt',
         .catch((err) => {
           console.error(err);
         });
-
+    } else {
+      return res.send();
     }
+
+    //return res.json();
 
 });
 

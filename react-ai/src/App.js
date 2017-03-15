@@ -24,9 +24,13 @@ class App extends Component {
   }
 
   componentDidMount() {
+    this.checkAuthorization();
+  }
+
+  checkAuthorization() {
     let token = this.getCook('token');
     console.log(token);
-    //axios.defaults.headers.common['Authorization'] = token;
+
     axios.get(this.apiUrl + `auth/twitter/jwt?token=${token}`)
       .then(res => {
           if (res.data.valid) {
@@ -41,7 +45,20 @@ class App extends Component {
 
   handleTwitterLink = (e)=>{
     e.preventDefault();
-    window.location = this.apiUrl + 'auth/twitter';
+    var self = this,
+        params = 'location=0,status=0,width=800,height=600';
+    const authUrl = this.apiUrl + 'auth/twitter';
+
+    this.twitter_window = window.open(authUrl, 'twitterWindow', params);
+
+    this.interval = window.setInterval((function() {
+      if (self.twitter_window.closed) {
+        window.clearInterval(self.interval);
+        self.checkAuthorization();
+      }
+    }), 1000);
+    //window.location = this.apiUrl + 'auth/twitter';
+    //window.open(this.apiUrl + 'auth/twitter')
   }
 
   getCook(cookiename) {

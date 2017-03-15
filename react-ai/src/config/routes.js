@@ -1,23 +1,15 @@
 import React from 'react'
-import {Route, IndexRedirect} from 'react-router'
-import AuthService from '../utils/AuthService'
+import {Route, IndexRoute} from 'react-router'
 import App from '../App'
+import NotFound from '../components/NotFound'
+import AfterAuth from '../components/AfterAuth'
 
-const auth = new AuthService(__AUTH0_CLIENT_ID__, __AUTH0_DOMAIN__);
+const routes = (
+  <Route path="/">
+    <IndexRoute component={App}/>
+    <Route path="after-auth" component={AfterAuth}/>
+    <Route path="*" component={NotFound}/>
+  </Route>
+);
 
-// onEnter callback to validate authentication in private routes
-const requireAuth = (nextState, replace) => {
-  if (!auth.loggedIn()) {
-    replace({ pathname: '/login' })
-  }
-}
-
-export const makeMainRoutes = () => {
-  return (
-    <Route path="/" component={App} auth={auth}>
-      <IndexRedirect to="/" />
-    </Route>
-  )
-}
-
-export default makeMainRoutes
+export default routes;
