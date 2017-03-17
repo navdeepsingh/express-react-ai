@@ -5,13 +5,12 @@ var mongoose = require('mongoose')
 
 var Schema = new Schema({
       user_id    : ObjectId,
-      twitter_id     : String,
-      username      : String,
+      facebook_id     : Number,
       name      : String,
-      photos    : Array,
+      token      : String,
       dateAdded: {type: Date, default: Date.now}
   });
 Schema.plugin(findOrCreate);
 
-var TwitterUser = mongoose.model('TwitterUser', Schema);
-module.exports = TwitterUser;
+var FacebookUser = mongoose.model('FacebookUser', Schema);
+module.exports = FacebookUser;

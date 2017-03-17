@@ -57,8 +57,24 @@ class App extends Component {
         self.checkAuthorization();
       }
     }), 1000);
-    //window.location = this.apiUrl + 'auth/twitter';
-    //window.open(this.apiUrl + 'auth/twitter')
+  }
+
+  handleFacebookLink = (e)=>{
+    e.preventDefault();
+
+    var self = this,
+        params = 'location=0,status=0,width=800,height=600';
+    const authUrl = this.apiUrl + 'auth/facebook';
+
+    this.facebook_window = window.open(authUrl, 'facebookWindow', params);
+
+    this.interval = window.setInterval((function() {
+      if (self.facebook_window.closed) {
+        window.clearInterval(self.interval);
+        self.checkAuthorization();
+      }
+    }), 1000);
+
   }
 
   getCook(cookiename) {
@@ -74,7 +90,12 @@ class App extends Component {
       <div>
         <Wrapper>
           { this.state.showStepOne
-            ? <StepOne onClickTwitterLink={this.handleTwitterLink} stepOneStatus={this.state.stepOneStatus}></StepOne>
+            ? <StepOne
+                onClickTwitterLink={this.handleTwitterLink}
+                onClickFacebookLink={this.handleFacebookLink}
+                stepOneStatus={this.state.stepOneStatus}
+              >
+              </StepOne>
             : null
           }
           { this.state.showStepTwo ? <StepTwo></StepTwo> : null }

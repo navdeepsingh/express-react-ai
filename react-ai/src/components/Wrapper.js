@@ -1,24 +1,15 @@
 import React from 'react';
-import { Grid, Row, Col, Navbar, Jumbotron } from 'react-bootstrap';
+import { Grid, Row, Col, Jumbotron } from 'react-bootstrap';
 
 // Stateless Function Component
 const Wrapper = (props) => {
 
   return (
         <div>
-          <Navbar inverse fixedTop>
-            <Grid>
-              <Navbar.Header>
-                <Navbar.Brand>
-                  <a href="/">React App</a>
-                </Navbar.Brand>
-                <Navbar.Toggle />
-              </Navbar.Header>
-            </Grid>
-          </Navbar>
           <Jumbotron>
             <Grid>
-              <h1>React - AlchemyAPI</h1>
+              <h1>Express + React - AlchemyAPI</h1>
+              <p>This app will let you connect with twitter and facebook and then can fetch posts/tweets.  After that symantic analysis of each feed will done. </p>
             </Grid>
           </Jumbotron>
           <Row>
