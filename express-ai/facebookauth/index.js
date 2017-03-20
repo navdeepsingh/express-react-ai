@@ -26,12 +26,12 @@ router.get('/callback',
   function(req, res) {
     var payload = {id: req.user.id};
     var token = jwt.sign(payload, config.jwt.SECRET_OR_KEY);
-    res.cookie('token', token, config.jwt.options);
-    res.json(req.user);
+    res.cookie('facebookToken', token, config.jwt.options);
+    //res.json(req.user);
 
     FacebookUserModel.findOrCreate({'facebook_id': req.user.id, 'name': req.user.displayName}, function(err, user){
       if (err) console.error(err);
-      console.log(user);
+      //console.log(user);
     })
 
     res.redirect('http://localhost:3000/after-auth');
@@ -52,7 +52,7 @@ router.get('/jwt',
           return user;
         })
         .then((user)=>{
-          return res.json({message: "Success! You can not see this without a token",token : token, decoded : decoded, valid : user});
+          return res.json({message: "Success! You can not see this without a token",token : token, decoded : decoded, user : user});
         })
         .catch((err) => {
           console.error(err);

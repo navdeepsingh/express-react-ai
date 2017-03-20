@@ -4,6 +4,9 @@ import StepOne from './components/StepOne';
 import StepTwo from './components/StepTwo';
 import StepThree from './components/StepThree';
 import axios from 'axios';
+import Progress from 'react-progress';
+import { ToastContainer, ToastMessage } from "react-toastr";
+const ToastMessageFactory = React.createFactory(ToastMessage.animation);
 
 class App extends Component {
 
@@ -16,65 +19,80 @@ class App extends Component {
       showStepOne : true,
       showStepTwo : false,
       showStepThree : false,
-      showAuthLogin : true,
-      stepOneStatus : 'Yet to Start'
+      linkTwitter : false,
+      linkFacebook : false,
+      progressValue: 0
     }
 
-    this.apiUrl = 'http://localhost:8080/'
+    String.prototype.capitalizeFirstLetter = function() {
+        return this.charAt(0).toUpperCase() + this.slice(1);
+    }
+
+    this.apiUrl = 'http://localhost:8080'
   }
 
   componentDidMount() {
-    this.checkAuthorization();
+    this._checkAuthorization('twitter');
+    this._checkAuthorization('facebook');
   }
 
-  checkAuthorization() {
-    let token = this.getCook('token');
-    console.log(token);
+  _checkAuthorization(handle) {
+    let token = this.getCook(`${handle}Token`);
+    if (token) {
+      axios.get(this.apiUrl + `/auth/${handle}/jwt?token=${token}`)
+        .then(res => {
+            let user = res.data.user;
 
-    axios.get(this.apiUrl + `auth/twitter/jwt?token=${token}`)
-      .then(res => {
-          if (res.data.valid) {
-            this.setState({stepOneStatus : 'Linked'})
-          }
-          console.log(JSON.stringify(res.data));
-      })
-      .catch(err => {
-        console.error(err);
-      })
+            // Display Toastr
+            this.refs.container.success(`You Connected Successfully with ${handle.capitalizeFirstLetter()} Account`, `Hello ${user.name}`, {
+              timeOut: 30000,
+              extendedTimeOut: 10000
+            })
+
+            // Set States
+            let states = {progressValue : 100};
+            if (handle === 'twitter')
+              states.linkTwitter = true;
+            else
+              states.linkFacebook = true;
+            this.setState(states);
+
+            if ( this.state.linkTwitter && this.state.linkFacebook ) {
+              this.setState({showStepTwo : true});
+            }
+
+        })
+        .catch(err => {
+          console.error(err);
+        });
+    }
+  }
+
+  _authPopup(handle) {
+    var self = this,
+        params = 'location=0,status=0,width=600,height=400';
+    const authUrl = `${this.apiUrl}/auth/${handle}`;
+
+    this.popup_window = window.open(authUrl, 'popupWindow', params);
+
+    this.interval = window.setInterval((function() {
+      if (self.popup_window.closed) {
+        window.clearInterval(self.interval);
+        self._checkAuthorization(handle);
+      }
+    }), 1000);
   }
 
   handleTwitterLink = (e)=>{
     e.preventDefault();
-    var self = this,
-        params = 'location=0,status=0,width=800,height=600';
-    const authUrl = this.apiUrl + 'auth/twitter';
-
-    this.twitter_window = window.open(authUrl, 'twitterWindow', params);
-
-    this.interval = window.setInterval((function() {
-      if (self.twitter_window.closed) {
-        window.clearInterval(self.interval);
-        self.checkAuthorization();
-      }
-    }), 1000);
+    if (!this.state.linkTwitter)
+      this._authPopup('twitter');
   }
 
   handleFacebookLink = (e)=>{
     e.preventDefault();
-
-    var self = this,
-        params = 'location=0,status=0,width=800,height=600';
-    const authUrl = this.apiUrl + 'auth/facebook';
-
-    this.facebook_window = window.open(authUrl, 'facebookWindow', params);
-
-    this.interval = window.setInterval((function() {
-      if (self.facebook_window.closed) {
-        window.clearInterval(self.interval);
-        self.checkAuthorization();
-      }
-    }), 1000);
-
+    if (!this.state.linkFacebook)
+      this._authPopup('facebook');
   }
 
   getCook(cookiename) {
@@ -89,11 +107,18 @@ class App extends Component {
     return (
       <div>
         <Wrapper>
+          <ToastContainer
+           toastMessageFactory={ToastMessageFactory}
+           ref="container"
+           className="toast-top-right"
+          />
+          <Progress percent={this.state.progressValue} speed={.60}/>
           { this.state.showStepOne
             ? <StepOne
                 onClickTwitterLink={this.handleTwitterLink}
                 onClickFacebookLink={this.handleFacebookLink}
-                stepOneStatus={this.state.stepOneStatus}
+                linkTwitter={this.state.linkTwitter}
+                linkFacebook={this.state.linkFacebook}
               >
               </StepOne>
             : null

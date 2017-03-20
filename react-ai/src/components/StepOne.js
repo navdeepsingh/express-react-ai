@@ -12,11 +12,23 @@ const stepOne = (props) => {
             <div className="col-md-12">
               <div className="row">
                 <div className="col-md-2"><a href="#" onClick={props.onClickTwitterLink}><img src={twitterLogo} width="50" height="50" alt="Twitter" /></a></div>
-                <div className="col-md-10">Authourise with Twitter</div>
+                <div className="col-md-10">
+                {
+                  props.linkTwitter
+                  ? `Connected with Twitter`
+                  : `Authourise with Twitter`
+                }
+                </div>
               </div>
               <div className="row">
                 <div className="col-md-2"><a href="#" onClick={props.onClickFacebookLink}><img src={facebookLogo} width="50" height="50" alt="Facebook" /></a></div>
-                <div className="col-md-10">Authourise with Facebook</div>
+                <div className="col-md-10">
+                {
+                  props.linkFacebook
+                  ? `Connected with Facebook`
+                  : `Authourise with Facebook`
+                }
+                </div>
               </div>
             </div>
           </div>

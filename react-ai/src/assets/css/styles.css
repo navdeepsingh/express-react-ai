@@ -1,0 +1,36 @@
+body{
+  display:-webkit-box;
+  display:-webkit-flex;
+  display:-ms-flexbox;
+  display:flex;
+  -webkit-box-align:center;
+  -webkit-align-items:center;
+  -ms-flex-align:center;
+  align-items:center;
+  -webkit-box-pack:center;
+  -webkit-justify-content:center;
+  -ms-flex-pack:center;
+  justify-content:center
+}
+body:before{
+  -webkit-filter:blur(5px);
+  -moz-filter:blur(5px);
+  -ms-filter:blur(5px);
+  -o-filter:blur(5px);
+  filter:blur(5px);
+  background-image:url(../express_react_mongo.jpg);
+  background-repeat:no-repeat;
+  background-size:cover;
+  display:block;
+  content:'';
+  z-index:-2;
+  position:absolute;
+  left:0;
+  width:100%;
+  top:0;
+  height:100%
+}
+.jumbotron{
+  color: white;
+  background-color: inherit;
+}

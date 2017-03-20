@@ -3,10 +3,8 @@ var bodyParser = require("body-parser");
 var app = express();
 var config = require('./config');
 var passport = require('passport');
-var passportJWT = require("passport-jwt");
 var cookieParser = require('cookie-parser');
 var cors = require('./config/cors');
-
 
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/express_react_ai');
