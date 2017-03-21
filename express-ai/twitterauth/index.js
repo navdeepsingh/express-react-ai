@@ -7,8 +7,16 @@ var passportJWT = require("passport-jwt");
 var TwitterStrategy = require('passport-twitter').Strategy;
 var jwt = require('jsonwebtoken');
 var config = require('../config');
+var twitterAPI = require('node-twitter-api');
+const promisify = require("es6-promisify");
+const twitter = new twitterAPI({
+          consumerKey: config.twitter.CONSUMER_KEY,
+          consumerSecret: config.twitter.CONSUMER_SECRET
+      });
 
-const TwitterUserModel = require('../models/twitter_users');
+const TwitterUser = require('../models/twitter_users');
+const TwitterUserModel = TwitterUser.Model;
+const TwitterFeedsModel = require('../models/twitter_feeds');
 
 passport.use(new TwitterStrategy({
     consumerKey: config.twitter.CONSUMER_KEY,
@@ -16,6 +24,36 @@ passport.use(new TwitterStrategy({
     callbackURL: config.twitter.CALLBACK_URL
   },
   function(token, tokenSecret, profile, cb) {
+    console.log('Testing from init');
+
+    const query = TwitterUserModel.findOne({'twitter_id': profile.id});
+    const promise = query.exec();
+    promise
+      .then(user=>{
+        if (user) {
+          user.dateUpdated = new Date()
+          user.token = token;
+          user.tokenSecret = tokenSecret;
+          return user.save();
+        } else {
+          TwitterUserModel.create({
+            'twitter_id': profile.id,
+            'username': profile.username,
+            'name': profile.displayName,
+            'photos': profile.photos,
+            'dateUpdated': new Date(),
+            'token': token,
+            'tokenSecret': tokenSecret
+          }, function(err, user){
+            if (err) console.error(err);
+            console.log('User Added' + user);
+          })
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+
     return cb(null, profile);
   }));
 
@@ -26,19 +64,6 @@ router.get('/callback',
     var payload = {id: req.user.id};
     var token = jwt.sign(payload, config.jwt.SECRET_OR_KEY);
     res.cookie('twitterToken', token, config.jwt.options);
-
-    //res.json(req.user);
-
-    TwitterUserModel.findOrCreate({
-        'twitter_id': req.user.id,
-        'username': req.user.username,
-        'name': req.user.displayName,
-        'photos': req.user.photos
-      }, function(err, user){
-      if (err) console.error(err);
-      console.log(user);
-    })
-
     res.redirect('http://localhost:3000/after-auth');
   }
 );
@@ -66,5 +91,36 @@ router.get('/jwt',
       return res.send();
     }
 });
+
+router.get('/statuses/home_timeline',
+  function(req, res){
+    const token = req.query.token;
+    var decoded = jwt.decode(token, {complete: true});
+    if (decoded) {
+      var query = TwitterUserModel.findOne({twitter_id: decoded.payload.id});
+      var promise = query.exec();
+      promise
+        .then((user) => {
+          const getTimeline = promisify( twitter.getTimeline.bind( twitter ), {multiArgs: true} );
+          return getTimeline("home_timeline", '', user.token, user.tokenSecret);
+        })
+        .then(result => {
+          // console.log(res);
+          // Promise all
+          for(let obj of result[0]) {
+              TwitterFeedsModel.create({user_id : user.id, feed: obj.text }, function(err, feed){
+                if (err) console.error(err);
+                console.log(feed);
+              })
+        	}
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    } else {
+      return res.send();
+    }
+  }
+);
 
 module.exports = router;

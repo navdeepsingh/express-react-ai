@@ -9,9 +9,16 @@ var Schema = new Schema({
       username      : String,
       name      : String,
       photos    : Array,
-      dateAdded: {type: Date, default: Date.now}
+      token     : String,
+      tokenSecret    : String,
+      dateAdded: {type: Date, default: Date.now},
+      dateUpdated: {type: Date}
   });
 Schema.plugin(findOrCreate);
 
 var TwitterUser = mongoose.model('TwitterUser', Schema);
-module.exports = TwitterUser;
+
+module.exports = {
+  Model : TwitterUser,
+  Schema : Schema
+}

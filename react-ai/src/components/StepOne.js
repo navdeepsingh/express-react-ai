@@ -7,7 +7,7 @@ import twitterLogo from '../assets/Twitter_Logo_Blue.svg';
 const stepOne = (props) => {
 
   return (
-        <Panel header="Step One : Link with twitter and FB account">
+        <Panel className="stepOne" header="Step One : Link with twitter and FB account">
           <div className="row">
             <div className="col-md-12">
               <div className="row">

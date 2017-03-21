@@ -7,7 +7,7 @@ var cookieParser = require('cookie-parser');
 var cors = require('./config/cors');
 
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/express_react_ai');
+mongoose.connect(config.dbUrl);
 
 passport.serializeUser(function(user, cb) {
   cb(null, user);

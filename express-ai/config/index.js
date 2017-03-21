@@ -1,6 +1,8 @@
 module.exports = {
   'port' : 8080,
 
+  'dbUrl' : 'mongodb://localhost/express_react_ai',
+
   'facebook': {
     'APP_ID': '212924785417190',
     'APP_SECRET': '4b4ca4e47912416d3cc74479d7112c04',

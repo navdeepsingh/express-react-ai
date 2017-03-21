@@ -14,6 +14,9 @@ class App extends Component {
     // Pass props to parent class
     super(props);
     this.handleTwitterLink = this.handleTwitterLink.bind(this);
+    this.handleFacebookLink = this.handleFacebookLink.bind(this);
+    this.handleTwitterPull = this.handleTwitterPull.bind(this);
+    this.handleFacebookPull = this.handleFacebookPull.bind(this);
     // Set initial state
     this.state = {
       showStepOne : true,
@@ -57,6 +60,7 @@ class App extends Component {
               states.linkFacebook = true;
             this.setState(states);
 
+            // If both Twitter and Facebook Account Linked Show Step Two
             if ( this.state.linkTwitter && this.state.linkFacebook ) {
               this.setState({showStepTwo : true});
             }
@@ -95,6 +99,26 @@ class App extends Component {
       this._authPopup('facebook');
   }
 
+  handleTwitterPull = (e)=>{
+    e.preventDefault();
+    let token = this.getCook(`twitterToken`);
+    axios.get(this.apiUrl + '/auth/twitter/statuses/home_timeline?token=' + token)
+      .then(res => {
+        console.log(res);
+      })
+    /*let token = this.getCook(`twitterToken`);
+    if (token) {
+      axios.get(this.apiUrl + `/auth/twitter/jwt?token=${token}`)
+        .then(res => {
+            let user = res.data.user;
+          });
+    }*/
+  }
+
+  handleFacebookPull = (e)=>{
+    e.preventDefault();
+  }
+
   getCook(cookiename) {
     // Get name followed by anything except a semicolon
     var cookiestring=RegExp(""+cookiename+"[^;]+").exec(document.cookie);
@@ -123,7 +147,14 @@ class App extends Component {
               </StepOne>
             : null
           }
-          { this.state.showStepTwo ? <StepTwo></StepTwo> : null }
+          { this.state.showStepTwo
+            ? <StepTwo
+                onClickTwitterPull={this.handleTwitterPull}
+                onClickFacebookPull={this.handleFacebookPull}
+              >
+              </StepTwo>
+            : null
+          }
           { this.state.showStepThree ? <StepThree></StepThree> : null }
         </Wrapper>
       </div>
