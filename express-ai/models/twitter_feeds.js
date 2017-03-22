@@ -5,7 +5,6 @@ var mongoose = require('mongoose')
   , TwitterUserSchema = TwitterUser.Schema;
 
 var Schema = new Schema({
-      id    : ObjectId,
       user_id     : { type: ObjectId, ref: 'TwitterUserSchema' },
       feed      : String,
       analysis      : String,

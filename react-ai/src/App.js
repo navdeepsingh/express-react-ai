@@ -101,18 +101,21 @@ class App extends Component {
 
   handleTwitterPull = (e)=>{
     e.preventDefault();
+    this.setState({progressValue : 0});
     let token = this.getCook(`twitterToken`);
     axios.get(this.apiUrl + '/auth/twitter/statuses/home_timeline?token=' + token)
       .then(res => {
+        // Display Toastr
+        this.refs.container.success(`Tweets Successfully Pulled`, '', {
+          timeOut: 30000,
+          extendedTimeOut: 10000
+        })
+
+        // Set States
+        let states = {progressValue : 100};
+        this.setState(states);
         console.log(res);
-      })
-    /*let token = this.getCook(`twitterToken`);
-    if (token) {
-      axios.get(this.apiUrl + `/auth/twitter/jwt?token=${token}`)
-        .then(res => {
-            let user = res.data.user;
-          });
-    }*/
+      });
   }
 
   handleFacebookPull = (e)=>{

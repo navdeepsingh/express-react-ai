@@ -2,6 +2,7 @@
 
 var express = require('express')
 var router = express.Router();
+var Promise = require("bluebird");
 var passport = require('passport');
 var passportJWT = require("passport-jwt");
 var TwitterStrategy = require('passport-twitter').Strategy;
@@ -99,24 +100,24 @@ router.get('/statuses/home_timeline',
     if (decoded) {
       var query = TwitterUserModel.findOne({twitter_id: decoded.payload.id});
       var promise = query.exec();
-      promise
-        .then((user) => {
-          const getTimeline = promisify( twitter.getTimeline.bind( twitter ), {multiArgs: true} );
-          return getTimeline("home_timeline", '', user.token, user.tokenSecret);
+      const getTimeline = promisify( twitter.getTimeline.bind( twitter ), {multiArgs: true} );
+
+      var execution = Promise.coroutine(function* (){
+        let resultA = yield promise;
+        let resultB = yield getTimeline("home_timeline", '', resultA.token, resultA.tokenSecret);
+
+        TwitterFeedsModel.remove({user_id : resultA._id},err => {
+          if (err) console.error(err);
         })
-        .then(result => {
-          // console.log(res);
-          // Promise all
-          for(let obj of result[0]) {
-              TwitterFeedsModel.create({user_id : user.id, feed: obj.text }, function(err, feed){
-                if (err) console.error(err);
-                console.log(feed);
-              })
-        	}
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+
+        for(let obj of resultB[0]) {
+            TwitterFeedsModel.create({user_id : resultA._id, feed: obj.text }, function(err, feed){
+              if (err) console.error(err);
+            })
+        }
+        return res.send({message : 'Pull Done'});
+      })();
+
     } else {
       return res.send();
     }
