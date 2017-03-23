@@ -14,6 +14,7 @@
     "body-parser": "~1.16.0",
     "cookie-parser": "^1.4.3",
     "es6-promisify": "^5.0.0",
+    "facebook-node-sdk": "^0.2.0",
     "mongoose": "^4.8.7",
     "mongoose-findorcreate": "^1.0.0",
     "node-twitter-api": "^1.8.0",

@@ -4,6 +4,7 @@ import StepOne from './components/StepOne';
 import StepTwo from './components/StepTwo';
 import StepThree from './components/StepThree';
 import axios from 'axios';
+import Util from './utils';
 import Progress from 'react-progress';
 import { ToastContainer, ToastMessage } from "react-toastr";
 const ToastMessageFactory = React.createFactory(ToastMessage.animation);
@@ -17,6 +18,7 @@ class App extends Component {
     this.handleFacebookLink = this.handleFacebookLink.bind(this);
     this.handleTwitterPull = this.handleTwitterPull.bind(this);
     this.handleFacebookPull = this.handleFacebookPull.bind(this);
+    this.handleViewFeeds = this.handleViewFeeds.bind(this);
     // Set initial state
     this.state = {
       showStepOne : true,
@@ -25,10 +27,6 @@ class App extends Component {
       linkTwitter : false,
       linkFacebook : false,
       progressValue: 0
-    }
-
-    String.prototype.capitalizeFirstLetter = function() {
-        return this.charAt(0).toUpperCase() + this.slice(1);
     }
 
     this.apiUrl = 'http://localhost:8080'
@@ -40,14 +38,14 @@ class App extends Component {
   }
 
   _checkAuthorization(handle) {
-    let token = this.getCook(`${handle}Token`);
+    let token = Util.getCookie(`${handle}Token`);
     if (token) {
       axios.get(this.apiUrl + `/auth/${handle}/jwt?token=${token}`)
         .then(res => {
             let user = res.data.user;
 
             // Display Toastr
-            this.refs.container.success(`You Connected Successfully with ${handle.capitalizeFirstLetter()} Account`, `Hello ${user.name}`, {
+            this.refs.container.success(`You Connected Successfully with ${Util.capitalizeFirstLetter(handle)} Account`, `Hello ${user.name}`, {
               timeOut: 30000,
               extendedTimeOut: 10000
             })
@@ -102,7 +100,7 @@ class App extends Component {
   handleTwitterPull = (e)=>{
     e.preventDefault();
     this.setState({progressValue : 0});
-    let token = this.getCook(`twitterToken`);
+    let token = Util.getCookie(`twitterToken`);
     axios.get(this.apiUrl + '/auth/twitter/statuses/home_timeline?token=' + token)
       .then(res => {
         // Display Toastr
@@ -114,19 +112,31 @@ class App extends Component {
         // Set States
         let states = {progressValue : 100};
         this.setState(states);
-        console.log(res);
       });
   }
 
   handleFacebookPull = (e)=>{
     e.preventDefault();
+    this.setState({progressValue : 0});
+    let token = Util.getCookie(`facebookToken`);
+    axios.get(this.apiUrl + '/auth/facebook/feed?token=' + token)
+      .then(res => {
+        // Display Toastr
+        this.refs.container.success(`Posts Successfully Pulled`, '', {
+          timeOut: 30000,
+          extendedTimeOut: 10000
+        })
+
+        // Set States
+        let states = {progressValue : 100};
+        this.setState(states);
+        console.log(res);
+      });
   }
 
-  getCook(cookiename) {
-    // Get name followed by anything except a semicolon
-    var cookiestring=RegExp(""+cookiename+"[^;]+").exec(document.cookie);
-    // Return everything after the equal sign, or an empty string if the cookie name not found
-    return unescape(!!cookiestring ? cookiestring.toString().replace(/^[^=]+./,"") : "");
+  handleViewFeeds = (e) => {
+    e.preventDefault();
+
   }
 
   render() {
@@ -154,6 +164,7 @@ class App extends Component {
             ? <StepTwo
                 onClickTwitterPull={this.handleTwitterPull}
                 onClickFacebookPull={this.handleFacebookPull}
+                onClickViewFeeds={this.handleViewFeeds}
               >
               </StepTwo>
             : null

@@ -8,7 +8,7 @@ const Wrapper = (props) => {
         <div>
           <Jumbotron>
             <Grid>
-              <h1>Express + React - AlchemyAPI</h1>
+              <h1>Express, React, MongoDB - AlchemyAPI</h1>
               <p>This app will let you connect with twitter and facebook and then can fetch posts/tweets.  After that symantic analysis of each feed will done. </p>
             </Grid>
           </Jumbotron>

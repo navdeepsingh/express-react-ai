@@ -79,7 +79,6 @@ router.get('/jwt',
       var promise = query.exec();
       promise
         .then((user) => {
-          console.log(user);
           return user;
         })
         .then((user)=>{
@@ -102,6 +101,7 @@ router.get('/statuses/home_timeline',
       var promise = query.exec();
       const getTimeline = promisify( twitter.getTimeline.bind( twitter ), {multiArgs: true} );
 
+      // Genrator is being used
       var execution = Promise.coroutine(function* (){
         let resultA = yield promise;
         let resultB = yield getTimeline("home_timeline", '', resultA.token, resultA.tokenSecret);
@@ -116,7 +116,7 @@ router.get('/statuses/home_timeline',
             })
         }
         return res.send({message : 'Pull Done'});
-      })();
+      })(); // IIFE - Immidiaetely Invoked Function Expression is used
 
     } else {
       return res.send();
