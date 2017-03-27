@@ -3,6 +3,8 @@ import Wrapper from './components/Wrapper';
 import StepOne from './components/StepOne';
 import StepTwo from './components/StepTwo';
 import StepThree from './components/StepThree';
+import Modal from 'react-modal';
+import modalStyles from './assets/css/modal-styles';
 import axios from 'axios';
 import Util from './utils';
 import Progress from 'react-progress';
@@ -19,6 +21,9 @@ class App extends Component {
     this.handleTwitterPull = this.handleTwitterPull.bind(this);
     this.handleFacebookPull = this.handleFacebookPull.bind(this);
     this.handleViewFeeds = this.handleViewFeeds.bind(this);
+    /*this.openModal = this.openModal.bind(this);
+    this.afterOpenModal = this.afterOpenModal.bind(this);*/
+    this.handleCloseModal = this.handleCloseModal.bind(this);
     // Set initial state
     this.state = {
       showStepOne : true,
@@ -26,7 +31,10 @@ class App extends Component {
       showStepThree : false,
       linkTwitter : false,
       linkFacebook : false,
-      progressValue: 0
+      progressValue: 0,
+      modalIsOpen: false,
+      twitterFeeds: ['Loading Twitter Feeds..'],
+      facebookFeeds: ['Loading Facebook Feeds..']
     }
 
     this.apiUrl = 'http://localhost:8080'
@@ -136,7 +144,20 @@ class App extends Component {
 
   handleViewFeeds = (e) => {
     e.preventDefault();
+    this.setState({modalIsOpen: true});
+    const twToken = Util.getCookie(`twitterToken`);
+    const fbToken = Util.getCookie(`facebookToken`);
+    const token = `${twToken}|${fbToken}`;
+    axios.get(this.apiUrl + '/api/view-feeds?token=' + token)
+      .then(res => {
+        //let resJson = JSON.stringify(res);
+        this.setState({twitterFeeds : res.data.twitterFeeds, facebookFeeds : res.data.facebookFeeds});
+      });
 
+  }
+
+  handleCloseModal() {
+    this.setState({modalIsOpen: false});
   }
 
   render() {
@@ -144,12 +165,39 @@ class App extends Component {
     return (
       <div>
         <Wrapper>
+
+          <Modal
+            isOpen={this.state.modalIsOpen}
+            style={modalStyles}
+            contentLabel="Twiiter and Facebook Data"
+          >
+
+            <h2 ref="subtitle">Twiiter and Facebook Data</h2>
+            <hr />
+            <h3>Twitter Feeds : </h3>
+            <pre>
+            {[...this.state.twitterFeeds].map((feed, i) => {
+              return <div>{i + 1} : {feed.feed}</div>
+            })}
+            </pre>
+            <hr />
+            <h3>Facebook Feeds : </h3>
+            <pre>
+            {[...this.state.facebookFeeds].map((feed, i) => {
+              return <div>{i + 1} : {feed.feed}</div>
+            })}
+            </pre>
+            <button onClick={this.handleCloseModal}>close</button>
+          </Modal>
+
           <ToastContainer
            toastMessageFactory={ToastMessageFactory}
            ref="container"
            className="toast-top-right"
           />
+
           <Progress percent={this.state.progressValue} speed={.60}/>
+
           { this.state.showStepOne
             ? <StepOne
                 onClickTwitterLink={this.handleTwitterLink}

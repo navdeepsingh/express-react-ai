@@ -45,8 +45,11 @@ body:before{
 .stepTwo{
   position:relative;
   bottom: 159px;
-  left: 29px;
 }
 .stepTwo .panel-body{
   height: 137px;
+}
+/* Remove scroll on the body when react-modal is open */
+.ReactModal__Body--open {
+    overflow: hidden;
 }

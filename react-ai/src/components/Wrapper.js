@@ -13,7 +13,7 @@ const Wrapper = (props) => {
             </Grid>
           </Jumbotron>
           <Row>
-            <Col md={4} mdOffset={4}>
+            <Col md={4} mdOffset={4} xs={10} xsOffset={1}>
               {props.children}
             </Col>
           </Row>

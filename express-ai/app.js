@@ -5,6 +5,7 @@ var config = require('./config');
 var passport = require('passport');
 var cookieParser = require('cookie-parser');
 var cors = require('./config/cors');
+var auth = require('./middleware/auth');
 
 var mongoose = require('mongoose');
 mongoose.connect(config.dbUrl);
@@ -36,6 +37,7 @@ app.get("/", function(req, res) {
 });
 app.use('/auth/twitter', log, require('./twitterauth'));
 app.use('/auth/facebook', log, require('./facebookauth'));
+app.use('/api', log, auth(), require('./api'));
 
 
 function log(req, res, next) {

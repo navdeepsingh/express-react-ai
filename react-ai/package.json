@@ -12,6 +12,7 @@
     "react": "^15.4.2",
     "react-bootstrap": "^0.30.7",
     "react-dom": "^15.4.2",
+    "react-modal": "^1.7.3",
     "react-progress": "0.0.12",
     "react-router": "^2.0.0-rc5",
     "react-toastr": "^2.8.2"

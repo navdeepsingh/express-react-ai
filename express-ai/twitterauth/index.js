@@ -88,7 +88,7 @@ router.get('/jwt',
           console.error(err);
         });
     } else {
-      return res.send();
+      return res.send('You are not authorised to proceed.');
     }
 });
 
@@ -119,7 +119,7 @@ router.get('/statuses/home_timeline',
       })(); // IIFE - Immidiaetely Invoked Function Expression is used
 
     } else {
-      return res.send();
+      return res.send('You are not authorised to proceed.');
     }
   }
 );

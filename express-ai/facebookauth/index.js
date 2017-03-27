@@ -28,7 +28,7 @@ passport.use(new FacebookStrategy({
       .then(user=>{
         if (user) {
           user.dateUpdated = new Date()
-          user.token = refreshToken;
+          user.token = accessToken;
           return user.save();
         } else {
           FacebookUserModel.create({
@@ -80,7 +80,7 @@ router.get('/jwt',
           console.error(err);
         });
     } else {
-      return res.send();
+      return res.send('You are not authorised to proceed.');
     }
 });
 
@@ -95,6 +95,11 @@ router.get('/feed',
         .then(user => {
           facebook.api('/me/feed', {access_token : user.token}, function(err, result) {
             if (err) console.error(err);
+
+            FacebookFeedsModel.remove({user_id : user._id},err => {
+              if (err) console.error(err);
+            })
+
             // ES6 filter method used for filtering
             const filteredData = result.data.filter(post => post.message !== undefined)
                                             .map(post => post.message);
@@ -112,9 +117,8 @@ router.get('/feed',
           return;
         });
 
-
     } else {
-      return res.send();
+      return res.send('You are not authorised to proceed.');
     }
   }
 );
