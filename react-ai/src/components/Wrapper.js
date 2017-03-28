@@ -12,11 +12,13 @@ const Wrapper = (props) => {
               <p>This app will let you connect with twitter and facebook and then can fetch posts/tweets.  After that symantic analysis of each feed will done. </p>
             </Grid>
           </Jumbotron>
-          <Row>
-            <Col md={4} mdOffset={4} xs={10} xsOffset={1}>
-              {props.children}
-            </Col>
-          </Row>
+          <Grid>
+            <Row>
+              <Col md={4} mdOffset={4} xs={11}>
+                {props.children}
+              </Col>
+            </Row>
+          </Grid>
         </div>
       )
 }

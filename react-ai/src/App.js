@@ -4,6 +4,7 @@ import StepOne from './components/StepOne';
 import StepTwo from './components/StepTwo';
 import StepThree from './components/StepThree';
 import Modal from 'react-modal';
+import Feed from './components/Feed';
 import modalStyles from './assets/css/modal-styles';
 import axios from 'axios';
 import Util from './utils';
@@ -21,8 +22,6 @@ class App extends Component {
     this.handleTwitterPull = this.handleTwitterPull.bind(this);
     this.handleFacebookPull = this.handleFacebookPull.bind(this);
     this.handleViewFeeds = this.handleViewFeeds.bind(this);
-    /*this.openModal = this.openModal.bind(this);
-    this.afterOpenModal = this.afterOpenModal.bind(this);*/
     this.handleCloseModal = this.handleCloseModal.bind(this);
     // Set initial state
     this.state = {
@@ -51,6 +50,7 @@ class App extends Component {
       axios.get(this.apiUrl + `/auth/${handle}/jwt?token=${token}`)
         .then(res => {
             let user = res.data.user;
+            let feeds = res.data.feed;
 
             // Display Toastr
             this.refs.container.success(`You Connected Successfully with ${Util.capitalizeFirstLetter(handle)} Account`, `Hello ${user.name}`, {
@@ -60,15 +60,19 @@ class App extends Component {
 
             // Set States
             let states = {progressValue : 100};
-            if (handle === 'twitter')
+            if (handle === 'twitter') {
               states.linkTwitter = true;
-            else
+            } else {
               states.linkFacebook = true;
+            }
             this.setState(states);
 
             // If both Twitter and Facebook Account Linked Show Step Two
             if ( this.state.linkTwitter && this.state.linkFacebook ) {
               this.setState({showStepTwo : true});
+            }
+            if (  this.state.linkTwitter && this.state.linkFacebook && feeds !== null ){
+              this.setState({showStepThree : true});
             }
 
         })
@@ -150,10 +154,8 @@ class App extends Component {
     const token = `${twToken}|${fbToken}`;
     axios.get(this.apiUrl + '/api/view-feeds?token=' + token)
       .then(res => {
-        //let resJson = JSON.stringify(res);
         this.setState({twitterFeeds : res.data.twitterFeeds, facebookFeeds : res.data.facebookFeeds});
       });
-
   }
 
   handleCloseModal() {
@@ -169,25 +171,27 @@ class App extends Component {
           <Modal
             isOpen={this.state.modalIsOpen}
             style={modalStyles}
-            contentLabel="Twiiter and Facebook Data"
+            shouldCloseOnOverlayClick={true}
+            contentLabel="Twitter and Facebook Data"
           >
-
-            <h2 ref="subtitle">Twiiter and Facebook Data</h2>
+            <h2 ref="subtitle">Twitter & Facebook Data <button className="btn btn-lg btn-primary pull-right" onClick={this.handleCloseModal}>close</button></h2>
             <hr />
             <h3>Twitter Feeds : </h3>
             <pre>
-            {[...this.state.twitterFeeds].map((feed, i) => {
-              return <div>{i + 1} : {feed.feed}</div>
-            })}
+            {
+              [...this.state.twitterFeeds].map((feed, i) => {
+                return <Feed className="twitter-color" index={i+1} feed={feed.feed} dateAdded={feed.dateAdded} />
+              })
+            }
             </pre>
             <hr />
             <h3>Facebook Feeds : </h3>
             <pre>
             {[...this.state.facebookFeeds].map((feed, i) => {
-              return <div>{i + 1} : {feed.feed}</div>
+              return <Feed className="facebook-color" index={i+1} feed={feed.feed} dateAdded={feed.dateAdded} />
             })}
             </pre>
-            <button onClick={this.handleCloseModal}>close</button>
+            <button className="btn btn-lg btn-primary pull-right" onClick={this.handleCloseModal}>close</button>
           </Modal>
 
           <ToastContainer

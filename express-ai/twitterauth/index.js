@@ -77,16 +77,14 @@ router.get('/jwt',
     if (decoded) {
       var query = TwitterUserModel.findOne({twitter_id: decoded.payload.id});
       var promise = query.exec();
-      promise
-        .then((user) => {
-          return user;
-        })
-        .then((user)=>{
-          return res.json({message: "Success! You can not see this without a token",token : token, decoded : decoded, user : user});
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+
+      // Genrator is being used
+      var execution = Promise.coroutine(function* (){
+        let resultA = yield promise;
+        let resultB = yield TwitterFeedsModel.findOne({user_id: resultA._id}).exec();
+        return res.send({message: "Success! You can not see this without a token",token : token, decoded : decoded, user : resultA, feed: resultB});
+      })(); // IIFE - Immidiaetely Invoked Function Expression is used
+
     } else {
       return res.send('You are not authorised to proceed.');
     }

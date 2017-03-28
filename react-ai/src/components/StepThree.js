@@ -5,7 +5,7 @@ import { Panel } from 'react-bootstrap';
 const stepTwo = (props) => {
 
   return (
-        <Panel header="Step Three : Analyzing Sentences">
+        <Panel className="stepThree" header="Step Three : Analyzing Sentences">
           <a href="#">Initiate Analyzing</a>
         </Panel>
       )
