@@ -42,6 +42,9 @@ class App extends Component {
   componentDidMount() {
     this._checkAuthorization('twitter');
     this._checkAuthorization('facebook');
+    //Animate Heading
+    const heading = document.querySelector('.jump');
+    heading.innerHTML = [...heading.textContent].map(letter => `<span>${letter}</span>`).join('');
   }
 
   _checkAuthorization(handle) {
@@ -180,7 +183,7 @@ class App extends Component {
             <pre>
             {
               [...this.state.twitterFeeds].map((feed, i) => {
-                return <Feed className="twitter-color" index={i+1} feed={feed.feed} dateAdded={feed.dateAdded} />
+                return <Feed key={feed._id} className="twitter-color" index={i+1} feed={feed.feed} dateAdded={feed.dateAdded} />
               })
             }
             </pre>
@@ -188,7 +191,7 @@ class App extends Component {
             <h3>Facebook Feeds : </h3>
             <pre>
             {[...this.state.facebookFeeds].map((feed, i) => {
-              return <Feed className="facebook-color" index={i+1} feed={feed.feed} dateAdded={feed.dateAdded} />
+              return <Feed key={feed._id} className="facebook-color" index={i+1} feed={feed.feed} dateAdded={feed.dateAdded} />
             })}
             </pre>
             <button className="btn btn-lg btn-primary pull-right" onClick={this.handleCloseModal}>close</button>

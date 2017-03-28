@@ -74,6 +74,15 @@ body:before{
   background-color: #3b5998;
   color: #fff;
 }
-.panel{
-  cursor:url(../santahand.png), auto;
+.panel-heading, .panel a:hover{
+  cursor:url(../santahand.png), default;
+}
+.jump span{
+  color: yellow;
+  cursor:url(../santahand.png), default;
+  transition: transform 0.2s;
+  display: inline-block;
+}
+.jump span:hover{
+  transform: translateY(-20px) rotate(10deg) scale(2);
 }
