@@ -6,7 +6,7 @@ const stepTwo = (props) => {
 
   return (
         <Panel className="stepThree" header="Step Three : Analyzing Sentences">
-          <a href="#">Initiate Analyzing</a>
+          <a href="#" onClick={props.onClickAnalyze}>Initiate Analyzing</a>
         </Panel>
       )
 }

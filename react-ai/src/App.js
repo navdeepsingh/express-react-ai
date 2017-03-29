@@ -40,43 +40,26 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this._checkAuthorization('twitter');
-    this._checkAuthorization('facebook');
+    this._checkAuthorization();
     //Animate Heading
     const heading = document.querySelector('.jump');
     heading.innerHTML = [...heading.textContent].map(letter => `<span>${letter}</span>`).join('');
   }
 
-  _checkAuthorization(handle) {
-    let token = Util.getCookie(`${handle}Token`);
+  _checkAuthorization() {
+    const twToken = Util.getCookie(`twitterToken`);
+    const fbToken = Util.getCookie(`facebookToken`);
+    const token = `${twToken}|${fbToken}`;
     if (token) {
-      axios.get(this.apiUrl + `/auth/${handle}/jwt?token=${token}`)
+      axios.get(this.apiUrl + `/api/auth?token=${token}`)
         .then(res => {
-            let user = res.data.user;
-            let feeds = res.data.feed;
+            let twitterUser = res.data.twitterUser;
+            let facebookUser = res.data.facebookUser;
 
-            // Display Toastr
-            this.refs.container.success(`You Connected Successfully with ${Util.capitalizeFirstLetter(handle)} Account`, `Hello ${user.name}`, {
-              timeOut: 30000,
-              extendedTimeOut: 10000
-            })
-
-            // Set States
-            let states = {progressValue : 100};
-            if (handle === 'twitter') {
-              states.linkTwitter = true;
-            } else {
-              states.linkFacebook = true;
-            }
-            this.setState(states);
-
-            // If both Twitter and Facebook Account Linked Show Step Two
-            if ( this.state.linkTwitter && this.state.linkFacebook ) {
-              this.setState({showStepTwo : true});
-            }
-            if (  this.state.linkTwitter && this.state.linkFacebook && feeds !== null ){
-              this.setState({showStepThree : true});
-            }
+            if (twitterUser)
+              this.setState({linkTwitter : true});
+            if (facebookUser)
+              this.setState({linkFacebook : true});
 
         })
         .catch(err => {
@@ -158,6 +141,23 @@ class App extends Component {
     axios.get(this.apiUrl + '/api/view-feeds?token=' + token)
       .then(res => {
         this.setState({twitterFeeds : res.data.twitterFeeds, facebookFeeds : res.data.facebookFeeds});
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
+  handleAnalyze = (e) => {
+    e.preventDefault();
+    const twToken = Util.getCookie(`twitterToken`);
+    const fbToken = Util.getCookie(`facebookToken`);
+    const token = `${twToken}|${fbToken}`;
+    axios.get(this.apiUrl + '/api/analyze?token=' + token)
+      .then(res => {
+        console.log(res);
+      })
+      .catch(err => {
+        console.error(err);
       });
   }
 
@@ -224,7 +224,7 @@ class App extends Component {
               </StepTwo>
             : null
           }
-          { this.state.showStepThree ? <StepThree></StepThree> : null }
+          { this.state.showStepThree ? <StepThree onClickAnalyze={this.handleAnalyze}></StepThree> : null }
         </Wrapper>
       </div>
     );

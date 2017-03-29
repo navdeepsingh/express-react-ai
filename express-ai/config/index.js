@@ -18,7 +18,12 @@ module.exports = {
   'jwt': {
     'SECRET_OR_KEY': 'DevilCircuit',
     'options' : {
-            maxAge: 1000 * 60 * 60, // would expire after 60 minutes
+            maxAge: 1000 * 60 * 120, // would expire after 120 minutes
         }
+  },
+
+  'alchemyapi': {
+    'username': '550b8618-3cbd-4bb1-920e-808570a648fb',
+    'password': "Q1dRI1CaHMld"
   }
 }

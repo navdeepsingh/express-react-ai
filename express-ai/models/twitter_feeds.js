@@ -7,7 +7,7 @@ var mongoose = require('mongoose')
 var Schema = new Schema({
       user_id     : { type: ObjectId, ref: 'TwitterUserSchema' },
       feed      : String,
-      analysis      : String,
+      analysis      : Object,
       dateAdded: {type: Date, default: Date.now},
       dateUpdated: {type: Date}
   });

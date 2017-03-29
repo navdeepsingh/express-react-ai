@@ -7,39 +7,31 @@ const FacebookUserModel = FacebookUser.Model;
 
 module.exports = function() {
   return function(req, res, next) {
-    // Implement the middleware function based on the options object
-    console.log('Implementing Middlware');
-    if (req.query.token) {
+    // Implement the middleware function
+    console.log('<== Auth Middlware Fired ==>');
+    if (req.query.token || req.query.token !== '|') {
       const [twToken, fbToken] = req.query.token.split('|');
 
       let twDecoded = jwt.decode(twToken, {complete: true});
       let fbDecoded = jwt.decode(fbToken, {complete: true});
 
-      if (twDecoded && fbDecoded) {
-        let twPromise = TwitterUserModel.findOne({twitter_id: twDecoded.payload.id}).exec();
-        let fbPromise = FacebookUserModel.findOne({facebook_id: fbDecoded.payload.id}).exec();
+      var execution = Promise.coroutine(function* (){
+        if (twDecoded) {
+          let twPromise = TwitterUserModel.findOne({twitter_id: twDecoded.payload.id}).exec();
+          let twitterUser =  yield twPromise;
+          req.twitterUser = twitterUser;
+        }
 
-        // Genrator is being used
-        var execution = Promise.coroutine(function* (){
-          var twResult = yield twPromise;
-          var fbResult = yield twPromise;
+        if (fbDecoded) {
+          let fbPromise = FacebookUserModel.findOne({facebook_id: fbDecoded.payload.id}).exec();
+          let facebookUser =  yield fbPromise;
+          req.facebookUser = facebookUser;
+        }
+        next();
+      })();
 
-          if (twResult && fbResult) {
-            next();
-          } else {
-            res.send('You are not authorised to proceed');
-          }
-        })();
-
-      } else {
-        res.send('You are not authorised to proceed');
-      }
-
+    } else {
+      res.send('You are not authorised to proceed. It\'s Middlware.');
     }
-
-    //if ( req.headers.cookie.indexOf('twitterToken') !== -1 || req.headers.cookie.indexOf('facebookToken') !== -1 )
-//      next()
-
-
   }
 }
