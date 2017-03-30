@@ -17,12 +17,27 @@ exports.main = function (req, res) {
 
 exports.auth = function (req, res) {
   if ( req.twitterUser || req.facebookUser ) {
-       console.log(req.twitterUser, req.facebookUser);
-       res.send({
-          message : 'Phew! You reached here with valid token',
-          twitterUser: req.twitterUser,
-          facebookUser: req.facebookUser
-        });
+       //console.log(req.twitterUser, req.facebookUser);
+       let twitterFeeds = '';
+       let facebookFeeds = '';
+       // Genrator is being used
+       var execution = Promise.coroutine(function* (){
+          if (req.twitterUser) {
+           let promiseA = TwitterFeedsModel.find({user_id : req.twitterUser._id}).exec();
+           twitterFeeds =  yield promiseA;
+          }
+          if (req.facebookUser) {
+           let promiseB = FacebookFeedsModel.find({user_id : req.facebookUser._id}).exec();
+           facebookFeeds =  yield promiseB;
+          }
+          res.send({
+             message : 'Phew! You reached here with valid token',
+             twitterUser: req.twitterUser,
+             facebookUser: req.facebookUser,
+             twitterFeeds,
+             facebookFeeds
+           });
+       })();
   }
   else {
     res.send('You are not authorised to proceed.Thanks!');

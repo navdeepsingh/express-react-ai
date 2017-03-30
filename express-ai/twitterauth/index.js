@@ -68,28 +68,6 @@ router.get('/callback',
     res.redirect('http://localhost:3000/after-auth');
   }
 );
-router.get('/jwt',
-  function(req, res){
-    const token = req.query.token;
-    var decoded = jwt.decode(token, {complete: true});
-    let valid = false;
-
-    if (decoded) {
-      var query = TwitterUserModel.findOne({twitter_id: decoded.payload.id});
-      var promise = query.exec();
-
-      // Genrator is being used
-      var execution = Promise.coroutine(function* (){
-        let resultA = yield promise;
-        let resultB = yield TwitterFeedsModel.findOne({user_id: resultA._id}).exec();
-        return res.send({message: "Success! You can not see this without a token",token : token, decoded : decoded, user : resultA, feed: resultB});
-      })(); // IIFE - Immidiaetely Invoked Function Expression is used
-
-    } else {
-      return res.send('You are not authorised to proceed.');
-    }
-});
-
 router.get('/statuses/home_timeline',
   function(req, res){
     const token = req.query.token;

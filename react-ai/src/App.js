@@ -34,7 +34,11 @@ class App extends Component {
       modalIsOpen: false,
       displayToast: false,
       twitterFeeds: ['Loading Twitter Feeds..'],
-      facebookFeeds: ['Loading Facebook Feeds..']
+      facebookFeeds: ['Loading Facebook Feeds..'],
+      toastMessage: props.toastMessage,
+      toastTitle: props.toastTitle,
+      toastTimeOut: props.toastTimeOut,
+
     }
 
     this.apiUrl = 'http://localhost:8080'
@@ -51,37 +55,58 @@ class App extends Component {
     const twToken = Util.getCookie(`twitterToken`);
     const fbToken = Util.getCookie(`facebookToken`);
     const token = `${twToken}|${fbToken}`;
-    if (token) {
+    if (token && token !== '|') {
       axios.get(this.apiUrl + `/api/auth?token=${token}`)
         .then(res => {
             let twitterUser = res.data.twitterUser;
             let facebookUser = res.data.facebookUser;
-            let toastMessage = '';
-            let toastTitle = '';
-            let toastTimeOut = 3000;
+            let twitterFeeds = res.data.twitterFeeds;
+            let facebookFeeds = res.data.facebookFeeds;
 
-            if (twitterUser) {
-              toastMessage = `You connected successfully with Twitter account.`;
-              toastTitle = `Hello ${twitterUser.name}`;
-              this.setState({linkTwitter : true, displayToast : true});
+            // For Step One  ======================================
+            if (twitterUser && typeof twitterUser === 'object' ) {
+              this.setState({
+                  linkTwitter : true,
+                  showStepTwo: false,
+                  displayToast : true,
+                  toastMessage : `You connected successfully with Twitter account.`,
+                  toastTitle: `Hello ${twitterUser.name}`
+                });
             }
-            if (facebookUser) {
-              toastMessage = `You connected successfully with Facebook account.`;
-              toastTitle = `Hello ${facebookUser.name}`;
-              this.setState({linkFacebook : true, displayToast : true});
+            if (facebookUser && typeof facebookUser === 'object') {
+              this.setState({
+                  linkFacebook : true,
+                  displayToast : true,
+                  showStepTwo: false,
+                  toastMessage : `You connected successfully with Facebook account.`,
+                  toastTitle: `Hello ${facebookUser.name}`
+                });
+            }
+            // For Step Two  ======================================
+            if (twitterUser && facebookUser) {
+              this.setState({
+                  showStepTwo: true,
+                  displayToast : true,
+                  toastMessage: `Awesome! Go Ahead with Step Two.`,
+                  toastTitle: `Hey ${facebookUser.name}`,
+                  toastTimeOut: 5000
+                });
             }
 
-            if (this.state.linkTwitter && this.state.linkFacebook) {
-              toastMessage = `Awesome! Go Ahead with Step Two.`;
-              toastTitle = `Hey ${facebookUser.name}`;
-              toastTimeOut = 5000;
-              this.setState({showStepTwo : true});
+            // For Step Three  ======================================
+            if ( twitterFeeds.length && facebookFeeds.length) {
+              this.setState({
+                  showStepThree: true,
+                  displayToast : true,
+                  toastMessage: `Yeaaaah! Go Ahead with Final Step Three.`,
+                  toastTitle: `Hey ${facebookUser.name}`,
+                });
             }
-
+            // =====================================================
             // Display Toastr
             if (this.state.displayToast) {
-              this.refs.container.success(toastMessage, toastTitle, {
-                timeOut: toastTimeOut
+              this.refs.container.success(this.state.toastMessage, this.state.toastTitle, {
+                timeOut: this.state.toastTimeOut
               });
             }
         })
@@ -101,7 +126,7 @@ class App extends Component {
     this.interval = window.setInterval((function() {
       if (self.popup_window.closed) {
         window.clearInterval(self.interval);
-        self._checkAuthorization(handle);
+        self._checkAuthorization();
       }
     }), 1000);
   }
@@ -198,22 +223,31 @@ class App extends Component {
             shouldCloseOnOverlayClick={true}
             contentLabel="Twitter and Facebook Data"
           >
-            <h2 ref="subtitle">Twitter & Facebook Data <button className="btn btn-lg btn-primary pull-right" onClick={this.handleCloseModal}>close</button></h2>
+            <h2 ref="subtitle">
+              Twitter & Facebook Data
+              <button className="btn btn-lg btn-primary pull-right" onClick={this.handleCloseModal}>close</button>
+            </h2>
             <hr />
             <h3>Twitter Feeds : </h3>
             <pre>
             {
+              [...this.state.twitterFeeds].length > 0 ?
               [...this.state.twitterFeeds].map((feed, i) => {
-                return <Feed key={feed._id} className="twitter-color" index={i+1} feed={feed.feed} dateAdded={feed.dateAdded} />
+                return <Feed key={i} className="twitter-color" index={i+1} feed={feed.feed} dateAdded={feed.dateAdded}></Feed>
               })
+              : 'No tweets collected Yet!'
             }
             </pre>
             <hr />
             <h3>Facebook Feeds : </h3>
             <pre>
-            {[...this.state.facebookFeeds].map((feed, i) => {
-              return <Feed key={feed._id} className="facebook-color" index={i+1} feed={feed.feed} dateAdded={feed.dateAdded} />
-            })}
+            {
+              [...this.state.facebookFeeds].length > 0 ?
+              [...this.state.facebookFeeds].map((feed, i) => {
+              return <Feed key={i} className="facebook-color" index={i+1} feed={feed.feed} dateAdded={feed.dateAdded}></Feed>
+              })
+              : 'No feed collected Yet!'
+            }
             </pre>
             <button className="btn btn-lg btn-primary pull-right" onClick={this.handleCloseModal}>close</button>
           </Modal>
@@ -252,6 +286,6 @@ class App extends Component {
   }
 }
 
-
+App.defaultProps = { toastMessage: '', toastTitle: '',  toastTimeOut: 3000 };
 
 export default App;

@@ -4,7 +4,7 @@ import React from 'react';
 const Feed = (props) => {
 
     return (
-        <pre className={props.className}>
+        <pre key={props.key} className={props.className}>
           <strong>{props.index}.</strong>&nbsp;
           {props.feed}<br />
           <small>{props.dateAdded}</small>
