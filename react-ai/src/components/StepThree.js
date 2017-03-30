@@ -6,7 +6,8 @@ const stepTwo = (props) => {
 
   return (
         <Panel className="stepThree" header="Step Three : Analyzing Sentences">
-          <a href="#" onClick={props.onClickAnalyze}>Initiate Analyzing</a>
+          <p>By using 3rd party API, sementic analysis of feeds will be done.</p>
+          <button className="btn btn-lg btn-primary" onClick={props.onClickAnalyze}>Initiate Analyzing</button>
         </Panel>
       )
 }

@@ -91,7 +91,7 @@ router.get('/statuses/home_timeline',
               if (err) console.error(err);
             })
         }
-        return res.send({message : 'Pull Done'});
+        return res.send({message : 'Pull Done', twitterFeeds: 1});
       })(); // IIFE - Immidiaetely Invoked Function Expression is used
 
     } else {

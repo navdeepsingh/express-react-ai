@@ -18,17 +18,21 @@ exports.main = function (req, res) {
 exports.auth = function (req, res) {
   if ( req.twitterUser || req.facebookUser ) {
        //console.log(req.twitterUser, req.facebookUser);
-       let twitterFeeds = '';
-       let facebookFeeds = '';
+       let twitterFeeds = 0;
+       let facebookFeeds = 0;
        // Genrator is being used
        var execution = Promise.coroutine(function* (){
           if (req.twitterUser) {
-           let promiseA = TwitterFeedsModel.find({user_id : req.twitterUser._id}).exec();
-           twitterFeeds =  yield promiseA;
+           let promiseA = TwitterFeedsModel.count({user_id : req.twitterUser._id}).exec();
+           let twitterFeedsResult =  yield promiseA;
+           if (twitterFeedsResult)
+            twitterFeeds = 1;
           }
           if (req.facebookUser) {
-           let promiseB = FacebookFeedsModel.find({user_id : req.facebookUser._id}).exec();
-           facebookFeeds =  yield promiseB;
+           let promiseB = FacebookFeedsModel.count({user_id : req.facebookUser._id}).exec();
+           let facebookFeedsResult =  yield promiseB;
+           if (facebookFeedsResult)
+            facebookFeeds = 1;
           }
           res.send({
              message : 'Phew! You reached here with valid token',

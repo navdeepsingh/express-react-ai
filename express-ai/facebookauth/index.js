@@ -86,7 +86,7 @@ router.get('/feed',
                 console.log(feed);
               });
             })
-            return res.send({message : 'Pull Done'});
+            return res.send({message : 'Pull Done', facebookFeeds: 1});
           });
         })
         .catch(err => {

@@ -30,7 +30,10 @@ class App extends Component {
       showStepThree : false,
       linkTwitter : false,
       linkFacebook : false,
+      PullTwitter : false,
+      PullFacebook : false,
       progressValue: 0,
+      progressHeight: 2,
       modalIsOpen: false,
       displayToast: false,
       twitterFeeds: ['Loading Twitter Feeds..'],
@@ -41,14 +44,39 @@ class App extends Component {
 
     }
 
-    this.apiUrl = 'http://localhost:8080'
+    this.apiUrl= 'http://localhost:8080';
+    this.progressHeight= 2;
   }
 
   componentDidMount() {
+    this._progressBarLoading();
     this._checkAuthorization();
+
     //Animate Heading
     const heading = document.querySelector('.jump');
     heading.innerHTML = [...heading.textContent].map(letter => `<span>${letter}</span>`).join('');
+  }
+
+  _progressBarLoading() {
+    this.interval = setInterval(() => {
+      let progressValue = this.state.progressValue;
+
+      if (progressValue === 100) {
+        this.setState({progressValue: 0, progressHeight: 0});
+        clearInterval(this.interval);
+        return;
+      }
+
+      progressValue = progressValue + 1;
+      this.setState({progressValue: progressValue, progressHeight: this.progressHeight});
+
+    }, 50);
+  }
+
+  componentWillUnmount() {
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
   }
 
   _checkAuthorization() {
@@ -62,6 +90,7 @@ class App extends Component {
             let facebookUser = res.data.facebookUser;
             let twitterFeeds = res.data.twitterFeeds;
             let facebookFeeds = res.data.facebookFeeds;
+            this.setState({PullTwitter: twitterFeeds, PullFacebook: facebookFeeds});
 
             // For Step One  ======================================
             if (twitterUser && typeof twitterUser === 'object' ) {
@@ -94,7 +123,7 @@ class App extends Component {
             }
 
             // For Step Three  ======================================
-            if ( twitterFeeds.length && facebookFeeds.length) {
+            if (this.state.PullTwitter && this.state.PullFacebook) {
               this.setState({
                   showStepThree: true,
                   displayToast : true,
@@ -145,36 +174,38 @@ class App extends Component {
 
   handleTwitterPull = (e)=>{
     e.preventDefault();
-    this.setState({progressValue : 0});
     let token = Util.getCookie(`twitterToken`);
+    this._progressBarLoading();
     axios.get(this.apiUrl + '/auth/twitter/statuses/home_timeline?token=' + token)
       .then(res => {
         // Display Toastr
         this.refs.container.success(`Tweets Successfully Pulled`, '', {
-          timeOut: 3000
+          timeOut: this.state.toastTimeOut
         })
 
         // Set States
-        let states = {progressValue : 100};
+        let states = {PullTwitter : true};
         this.setState(states);
+        this._checkAuthorization();
       });
   }
 
   handleFacebookPull = (e)=>{
     e.preventDefault();
-    this.setState({progressValue : 0});
     let token = Util.getCookie(`facebookToken`);
+    this._progressBarLoading();
     axios.get(this.apiUrl + '/auth/facebook/feed?token=' + token)
       .then(res => {
+
         // Display Toastr
         this.refs.container.success(`Posts Successfully Pulled`, '', {
-          timeOut: 3000
+          timeOut: this.state.toastTimeOut
         })
 
         // Set States
-        let states = {progressValue : 100};
+        let states = {PullFacebook : true};
         this.setState(states);
-        console.log(res);
+        this._checkAuthorization();
       });
   }
 
@@ -258,7 +289,7 @@ class App extends Component {
            className="toast-top-right"
           />
 
-          <Progress percent={this.state.progressValue} speed={.60}/>
+          <Progress percent={this.state.progressValue} height={this.state.progressHeight} speed={.80}/>
 
           { this.state.showStepOne
             ? <StepOne
