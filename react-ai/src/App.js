@@ -32,6 +32,7 @@ class App extends Component {
       linkFacebook : false,
       progressValue: 0,
       modalIsOpen: false,
+      displayToast: false,
       twitterFeeds: ['Loading Twitter Feeds..'],
       facebookFeeds: ['Loading Facebook Feeds..']
     }
@@ -55,12 +56,34 @@ class App extends Component {
         .then(res => {
             let twitterUser = res.data.twitterUser;
             let facebookUser = res.data.facebookUser;
+            let toastMessage = '';
+            let toastTitle = '';
+            let toastTimeOut = 3000;
 
-            if (twitterUser)
-              this.setState({linkTwitter : true});
-            if (facebookUser)
-              this.setState({linkFacebook : true});
+            if (twitterUser) {
+              toastMessage = `You connected successfully with Twitter account.`;
+              toastTitle = `Hello ${twitterUser.name}`;
+              this.setState({linkTwitter : true, displayToast : true});
+            }
+            if (facebookUser) {
+              toastMessage = `You connected successfully with Facebook account.`;
+              toastTitle = `Hello ${facebookUser.name}`;
+              this.setState({linkFacebook : true, displayToast : true});
+            }
 
+            if (this.state.linkTwitter && this.state.linkFacebook) {
+              toastMessage = `Awesome! Go Ahead with Step Two.`;
+              toastTitle = `Hey ${facebookUser.name}`;
+              toastTimeOut = 5000;
+              this.setState({showStepTwo : true});
+            }
+
+            // Display Toastr
+            if (this.state.displayToast) {
+              this.refs.container.success(toastMessage, toastTitle, {
+                timeOut: toastTimeOut
+              });
+            }
         })
         .catch(err => {
           console.error(err);
@@ -103,8 +126,7 @@ class App extends Component {
       .then(res => {
         // Display Toastr
         this.refs.container.success(`Tweets Successfully Pulled`, '', {
-          timeOut: 30000,
-          extendedTimeOut: 10000
+          timeOut: 3000
         })
 
         // Set States
@@ -121,8 +143,7 @@ class App extends Component {
       .then(res => {
         // Display Toastr
         this.refs.container.success(`Posts Successfully Pulled`, '', {
-          timeOut: 30000,
-          extendedTimeOut: 10000
+          timeOut: 3000
         })
 
         // Set States

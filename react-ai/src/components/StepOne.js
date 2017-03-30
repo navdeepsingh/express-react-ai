@@ -14,25 +14,23 @@ const stepOne = (props) => {
                 <Col md={2} sm={1} xs={2}>
                   <a href="#" onClick={props.onClickTwitterLink}><img src={twitterLogo} width="50" height="50" alt="Twitter" /></a>
                 </Col>
-                <Col md={10} sm={11} xs={10}>
-                  <span className='align-middle'>
+                <Col md={10} sm={11} xs={10} className="linkedStatus">
                     {
                       props.linkTwitter
-                      ? `Connected with Twitter`
-                      : `Authourise with Twitter`
+                      ? `👍 Connected with Twitter`
+                      : <a href="#" onClick={props.onClickTwitterLink}>Authourise with Twitter</a>
                     }
-                  </span>
                 </Col>
               </Row>
               <Row>
                 <Col md={2} sm={1} xs={2}>
                   <a href="#" onClick={props.onClickFacebookLink}><img src={facebookLogo} width="50" height="50" alt="Facebook" /></a>
                 </Col>
-                <Col md={10} sm={11} xs={10}>
+                <Col md={10} sm={11} xs={10} className="linkedStatus">
                 {
                   props.linkFacebook
-                  ? `Connected with Facebook`
-                  : `Authourise with Facebook`
+                  ? `👍 Connected with Facebook`
+                  : <a href="#" onClick={props.onClickFacebookLink}>Authourise with Facebook</a>
                 }
                 </Col>
               </Row>
