@@ -56,7 +56,7 @@ body:before{
   z-index: 102;
 }
 .stepTwo .panel-body, .stepThree .panel-body{
-  height: 137px;
+  height: 160px;
 }
 
 /* Remove scroll on the body when react-modal is open */
@@ -86,7 +86,13 @@ body:before{
 .jump span:hover{
   transform: translateY(-20px) rotate(10deg) scale(2);
 }
-.linkedStatus{
+.panel-heading{
+  font-size: 18px;
+}
+.panel-body{
   font-size: 21px;
+}
+
+.linkedStatus{
   padding-top: 10px;
 }

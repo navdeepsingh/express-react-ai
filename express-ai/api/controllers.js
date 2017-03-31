@@ -66,10 +66,10 @@ exports.viewFeeds = function (req, res) {
 }
 
 exports.analyze = function (req, res) {
-  if ( req.twitter_id && req.facebook_id ) {
+  if ( req.twitterUser && req.facebookUser ) {
 
-    let promiseA = TwitterFeedsModel.find({user_id : req.twitter_id}).exec();
-    let promiseB = FacebookFeedsModel.find({user_id : req.facebook_id}).exec();
+    let promiseA = TwitterFeedsModel.find({user_id : req.twitterUser._id}).exec();
+    let promiseB = FacebookFeedsModel.find({user_id : req.facebookUser._id}).exec();
 
     // Genrator is being used
     var execution = Promise.coroutine(function* (){
@@ -104,6 +104,9 @@ exports.analyze = function (req, res) {
        });
     })();
     res.send('Saved');
-}
+  }
+  else {
+    res.send('You are not authrised to proceed.Thanks!');
+  }
 
 }

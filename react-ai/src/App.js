@@ -30,8 +30,8 @@ class App extends Component {
       showStepThree : false,
       linkTwitter : false,
       linkFacebook : false,
-      PullTwitter : false,
-      PullFacebook : false,
+      pullTwitter : false,
+      pullFacebook : false,
       progressValue: 0,
       progressHeight: 2,
       modalIsOpen: false,
@@ -49,7 +49,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this._progressBarLoading();
+    //this._progressBarLoading();
     this._checkAuthorization();
 
     //Animate Heading
@@ -62,22 +62,23 @@ class App extends Component {
       let progressValue = this.state.progressValue;
 
       if (progressValue === 100) {
-        this.setState({progressValue: 0, progressHeight: 0});
+      //  this.setState({progressValue: 0, progressHeight: 0});
         clearInterval(this.interval);
         return;
       }
 
-      progressValue = progressValue + 1;
+      progressValue = progressValue + 0.5;
       this.setState({progressValue: progressValue, progressHeight: this.progressHeight});
 
-    }, 50);
+    }, 1);
   }
 
-  componentWillUnmount() {
-    if (this.interval) {
-      clearInterval(this.interval);
-    }
+  _clearLoading() {
+    //this.setState({progressValue: 100});
+    this.setState({progressValue: 0, progressHeight: 0});
+    //clearInterval(this.interval);
   }
+
 
   _checkAuthorization() {
     const twToken = Util.getCookie(`twitterToken`);
@@ -90,7 +91,7 @@ class App extends Component {
             let facebookUser = res.data.facebookUser;
             let twitterFeeds = res.data.twitterFeeds;
             let facebookFeeds = res.data.facebookFeeds;
-            this.setState({PullTwitter: twitterFeeds, PullFacebook: facebookFeeds});
+            this.setState({pullTwitter: twitterFeeds, pullFacebook: facebookFeeds});
 
             // For Step One  ======================================
             if (twitterUser && typeof twitterUser === 'object' ) {
@@ -112,7 +113,7 @@ class App extends Component {
                 });
             }
             // For Step Two  ======================================
-            if (twitterUser && facebookUser) {
+            if (twitterUser && facebookUser && (!this.state.pullTwitter || !this.state.pullFacebook)) {
               this.setState({
                   showStepTwo: true,
                   displayToast : true,
@@ -123,8 +124,9 @@ class App extends Component {
             }
 
             // For Step Three  ======================================
-            if (this.state.PullTwitter && this.state.PullFacebook) {
+            if (this.state.pullTwitter && this.state.pullFacebook) {
               this.setState({
+                  showStepTwo: true,
                   showStepThree: true,
                   displayToast : true,
                   toastMessage: `Yeaaaah! Go Ahead with Final Step Three.`,
@@ -181,12 +183,12 @@ class App extends Component {
         // Display Toastr
         this.refs.container.success(`Tweets Successfully Pulled`, '', {
           timeOut: this.state.toastTimeOut
-        })
+        });
 
         // Set States
-        let states = {PullTwitter : true};
-        this.setState(states);
+        this.setState({PullTwitter : true});
         this._checkAuthorization();
+        this._clearLoading();
       });
   }
 
@@ -196,16 +198,14 @@ class App extends Component {
     this._progressBarLoading();
     axios.get(this.apiUrl + '/auth/facebook/feed?token=' + token)
       .then(res => {
-
         // Display Toastr
         this.refs.container.success(`Posts Successfully Pulled`, '', {
           timeOut: this.state.toastTimeOut
-        })
-
+        });
         // Set States
-        let states = {PullFacebook : true};
-        this.setState(states);
+        this.setState({PullFacebook : true});
         this._checkAuthorization();
+        this._clearLoading();
       });
   }
 
@@ -229,8 +229,10 @@ class App extends Component {
     const twToken = Util.getCookie(`twitterToken`);
     const fbToken = Util.getCookie(`facebookToken`);
     const token = `${twToken}|${fbToken}`;
+    this._progressBarLoading();
     axios.get(this.apiUrl + '/api/analyze?token=' + token)
       .then(res => {
+        this._clearLoading();
         console.log(res);
       })
       .catch(err => {
@@ -306,6 +308,8 @@ class App extends Component {
                 onClickTwitterPull={this.handleTwitterPull}
                 onClickFacebookPull={this.handleFacebookPull}
                 onClickViewFeeds={this.handleViewFeeds}
+                pullTwitter={this.state.pullTwitter}
+                pullFacebook={this.state.pullFacebook}
               >
               </StepTwo>
             : null
