@@ -3,6 +3,7 @@ import Wrapper from './components/Wrapper';
 import StepOne from './components/StepOne';
 import StepTwo from './components/StepTwo';
 import StepThree from './components/StepThree';
+import Results from './components/Results';
 import Modal from 'react-modal';
 import Feed from './components/Feed';
 import modalStyles from './assets/css/modal-styles';
@@ -32,8 +33,9 @@ class App extends Component {
       linkFacebook : false,
       pullTwitter : false,
       pullFacebook : false,
+      analyzed : true,
       progressValue: 0,
-      progressHeight: 2,
+      progressHeight: 5,
       modalIsOpen: false,
       displayToast: false,
       twitterFeeds: ['Loading Twitter Feeds..'],
@@ -49,7 +51,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    //this._progressBarLoading();
+    this._progressBarLoading();
     this._checkAuthorization();
 
     //Animate Heading
@@ -67,15 +69,15 @@ class App extends Component {
         return;
       }
 
-      progressValue = progressValue + 0.5;
-      this.setState({progressValue: progressValue, progressHeight: this.progressHeight});
+      progressValue += 2;
+      this.setState({progressValue: progressValue});
 
-    }, 1);
+    }, 10);
   }
 
   _clearLoading() {
     //this.setState({progressValue: 100});
-    this.setState({progressValue: 0, progressHeight: 0});
+    this.setState({progressValue: 0});
     //clearInterval(this.interval);
   }
 
@@ -232,8 +234,19 @@ class App extends Component {
     this._progressBarLoading();
     axios.get(this.apiUrl + '/api/analyze?token=' + token)
       .then(res => {
-        this._clearLoading();
+        // Display Toastr
+        if (typeof res.data !== 'object') {
+          this.refs.container.success(res.data, '', {
+            timeOut: this.state.toastTimeOut
+          });
+          window.location = '/'
+        } else {
+          this.refs.container.success(`Analyzing Successfully Done`, '', {
+            timeOut: this.state.toastTimeOut
+          });
+        }
         console.log(res);
+        this._clearLoading();
       })
       .catch(err => {
         console.error(err);
@@ -315,6 +328,8 @@ class App extends Component {
             : null
           }
           { this.state.showStepThree ? <StepThree onClickAnalyze={this.handleAnalyze}></StepThree> : null }
+
+          { this.state.analyzed ? <Results /> : null}
         </Wrapper>
       </div>
     );

@@ -42,7 +42,7 @@ body:before{
   -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
   position: absolute;
-  width: 100%;
+  width: 95%;
 }
 .stepOne{
   z-index: 100;
@@ -92,7 +92,14 @@ body:before{
 .panel-body{
   font-size: 21px;
 }
-
 .linkedStatus{
   padding-top: 10px;
+}
+.results{
+  margin-top: 378px;
+  position: absolute;
+  color: #fff;
+}
+.results h2{
+  border-bottom: 1px solid #fff;
 }

@@ -76,7 +76,7 @@ exports.analyze = function (req, res) {
        let twitterFeeds =  yield promiseA;
        let facebookFeeds =  yield promiseB;
 
-       const socialFeeds = [twitterFeeds, facebookFeeds];
+      /* const socialFeeds = [twitterFeeds, facebookFeeds];
        socialFeeds.map(feeder => {
          for(const feed of feeder) {
            //console.log(feed.feed);
@@ -88,6 +88,7 @@ exports.analyze = function (req, res) {
            }, function(err, response) {
                 if (err) {
                   console.log('error:', err, feed.feed);
+                  return false;
                 } else {
                   console.log(JSON.stringify(response.sentiment.document, null, 2));
                   feed.analysis = response.sentiment.document;
@@ -101,9 +102,21 @@ exports.analyze = function (req, res) {
                 }
            });
          }
-       });
+       });*/
+       twitterFeeds = twitterFeeds.filter(tweet => tweet.analysis !== undefined)
+                   .map((tweet, i) => {
+                     tweet.analysis.feed = tweet.feed;
+                     tweet.analysis.index = i+1;
+                     return tweet.analysis;
+                   });
+       facebookFeeds = facebookFeeds.filter(post => post.analysis !== undefined)
+                     .map((post, i) => {
+                       post.analysis.feed = post.feed;
+                       post.analysis.index = i+1;
+                       return post.analysis;
+                     });
+       res.send({twitterFeeds, facebookFeeds});
     })();
-    res.send('Saved');
   }
   else {
     res.send('You are not authrised to proceed.Thanks!');
