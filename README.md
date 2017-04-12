@@ -9,11 +9,11 @@ Crafting an app using express and react as backend and frontend respectively
 
 ![alt text](http://i.imgur.com/cpB3dgj.png "Step 3 Screen")
 
+![alt text](http://i.imgur.com/6a434gt.png "Results Screen")
+
 
 ### Status
-Working on Data presentation using D3.js
+Working on deployment on Heroku
 
 ###### Thanks, ######
 __*Navdeep Singh*__
-
-
