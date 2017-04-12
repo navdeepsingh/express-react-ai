@@ -56,7 +56,7 @@ router.get('/callback',
   passport.authenticate('facebook', { failureRedirect: '/login' }),
   function(req, res) {
     var payload = {id: req.user.id};
-    var token = jwt.sign(payload, config.jwt.SECRET_OR_KEY);
+    var token = jwt.sign(payload, config.jwt.SECRET_OR_KEY, {expiresIn: config.jwt.options.maxAge});
     res.cookie('facebookToken', token, config.jwt.options);
     res.redirect('http://localhost:3000/after-auth');
   }

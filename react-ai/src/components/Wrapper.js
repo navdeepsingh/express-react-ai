@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Row, Col, Jumbotron } from 'react-bootstrap';
+import { Row, Col, Jumbotron } from 'react-bootstrap';
 
 // Stateless Function Component
 const Wrapper = (props) => {
