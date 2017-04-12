@@ -1,11 +1,11 @@
 {
   "port" : 8080,
 
-  "dbUrl" : "mongodb://localhost/express_react_ai",
+  "dbUrl" : "mongodb://heroku_5g2418kj:7koiupl32uek3m4nhdt5mu12k7@ds159670.mlab.com:59670/heroku_5g2418kj",
 
   "facebook": {
-    "APP_ID": "212924785417190",
-    "APP_SECRET": "4b4ca4e47912416d3cc74479d7112c04",
+    "APP_ID": "1296426047067053",
+    "APP_SECRET": "896cd915f95378ccfa77f8d58dde17a5",
     "CALLBACK_URL": "http://localhost:8080/auth/facebook/callback"
   },
 
